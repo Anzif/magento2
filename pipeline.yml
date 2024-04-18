@@ -1,0 +1,35 @@
+trigger:
+
+- main
+
+pool:
+
+  vmImage: 'ubuntu-latest'
+
+ 
+
+steps:
+
+- checkout: self
+
+  clean: true
+
+  persistCredentials: true
+
+ 
+
+- script: |
+
+    git fetch --all
+
+    git switch `basename $(Build.SourceBranch)`
+
+ 
+
+- script: curl -L 'https://spectral-us.dome9.com/latest/x/sh?dsn=$(SPECTRAL_DSN)' | sh
+
+  displayName: 'Install Spectral'
+
+- script: $HOME/.spectral/spectral scan --ok --dsn $(SPECTRAL_DSN) --engines secrets,iac,oss --include-tags base,audit,iac
+
+  displayName: 'Spectral Scan'
